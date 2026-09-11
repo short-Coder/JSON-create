@@ -1,0 +1,3185 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Proglight - data.json Generator</title>
+
+<style>
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --primary: #111827;
+    --primary-hover: #374151;
+    --soft: #f3f4f6;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --success: #16a34a;
+    --code-bg: #0b1120;
+    --code-text: #f8fafc;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* =========================
+   Header
+========================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    border-bottom: 1px solid var(--border);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+
+    object-fit: contain;
+
+    border-radius: 10px;
+}
+
+.logo-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+button {
+    font: inherit;
+}
+
+.btn {
+    border: 0;
+    border-radius: 10px;
+
+    padding: 10px 15px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        transform .2s,
+        opacity .2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: scale(.98);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+.btn-secondary {
+    background: var(--soft);
+    color: var(--text);
+}
+
+.btn-danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+/* =========================
+   Layout
+========================= */
+
+.app {
+    display: grid;
+
+    grid-template-columns:
+        280px
+        minmax(0, 1fr)
+        420px;
+
+    min-height:
+        calc(100vh - 68px);
+}
+
+/* =========================
+   Sidebar
+========================= */
+
+.sidebar {
+    padding: 20px;
+
+    background: #fafafa;
+
+    border-right: 1px solid var(--border);
+
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    margin-bottom: 12px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: var(--muted);
+}
+
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.lesson-item {
+    display: flex;
+    align-items: center;
+
+    padding: 11px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: white;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.lesson-item:hover {
+    border-color: #cbd5e1;
+
+    transform: translateY(-1px);
+}
+
+.lesson-item.active {
+    border-color: #111827;
+
+    background: #f3f4f6;
+}
+
+.lesson-number {
+    width: 28px;
+
+    flex-shrink: 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.lesson-title {
+    flex: 1;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.lesson-delete {
+    width: 27px;
+    height: 27px;
+
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: var(--danger);
+
+    cursor: pointer;
+}
+
+/* =========================
+   Editor
+========================= */
+
+.editor {
+    padding: 30px;
+
+    overflow-y: auto;
+}
+
+.page-title {
+    margin: 0;
+
+    font-size: 28px;
+}
+
+.page-description {
+    margin: 7px 0 28px;
+
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+/* =========================
+   Cards
+========================= */
+
+.card {
+    margin-bottom: 20px;
+
+    padding: 22px;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.card-title {
+    margin: 0 0 18px;
+
+    font-size: 17px;
+}
+
+/* =========================
+   Forms
+========================= */
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    padding: 11px 12px;
+
+    outline: none;
+
+    background: white;
+    color: var(--text);
+
+    font: inherit;
+
+    transition:
+        border-color .2s,
+        box-shadow .2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #64748b;
+
+    box-shadow:
+        0 0 0 3px rgba(100,116,139,.1);
+}
+
+textarea {
+    min-height: 110px;
+
+    resize: vertical;
+}
+
+.code-input {
+    min-height: 230px;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        monospace;
+
+    background: #0f172a;
+
+    color: #f8fafc;
+}
+
+/* =========================
+   Form Grid
+========================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+/* =========================
+   Slides
+========================= */
+
+.slide-editor {
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    background: #fafafa;
+}
+
+.slide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+}
+
+.slide-header-left {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.slide-number {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: var(--primary);
+    color: white;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.slide-type {
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: #e5e7eb;
+
+    color: #374151;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.slide-actions {
+    display: flex;
+
+    gap: 5px;
+}
+
+.icon-btn {
+    width: 31px;
+    height: 31px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: white;
+
+    color: var(--text);
+
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    background: #e5e7eb;
+}
+
+.icon-btn.delete {
+    color: var(--danger);
+}
+
+/* =========================
+   Array
+========================= */
+
+.array-editor {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.array-row {
+    display: flex;
+
+    gap: 7px;
+}
+
+.array-row input {
+    flex: 1;
+}
+
+.array-add {
+    align-self: flex-start;
+
+    margin-top: 4px;
+}
+
+/* =========================
+   Comparison
+========================= */
+
+.comparison-item {
+    padding: 14px;
+
+    margin-bottom: 10px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: white;
+}
+
+.comparison-item:last-child {
+    margin-bottom: 0;
+}
+
+.comparison-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* =========================
+   Preview
+========================= */
+
+.preview {
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+
+    background: var(--code-bg);
+
+    color: var(--code-text);
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+.preview-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.preview-btn {
+    border: 0;
+    border-radius: 8px;
+
+    padding: 8px 11px;
+
+    background: #1e293b;
+    color: #f8fafc;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.preview-btn:hover {
+    background: #334155;
+}
+
+#jsonOutput {
+    flex: 1;
+
+    width: 100%;
+    min-height: 500px;
+
+    padding: 15px;
+
+    border: 0;
+    border-radius: 10px;
+
+    resize: none;
+
+    outline: none;
+
+    background: #111827;
+    color: #f8fafc;
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        monospace;
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* =========================
+   Empty
+========================= */
+
+.empty {
+    padding: 35px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+}
+
+/* =========================
+   Toast
+========================= */
+
+.toast {
+    position: fixed;
+
+    right: 20px;
+    bottom: 20px;
+
+    z-index: 999;
+
+    padding: 12px 17px;
+
+    border-radius: 10px;
+
+    background: #111827;
+    color: white;
+
+    font-size: 13px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transform: translateY(10px);
+
+    transition: .25s;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1200px) {
+
+    .app {
+        grid-template-columns:
+            230px
+            minmax(0, 1fr);
+    }
+
+    .preview {
+        display: none;
+    }
+
+}
+
+@media (max-width: 750px) {
+
+    header {
+        padding: 0 14px;
+    }
+
+    .header-actions .btn-secondary {
+        display: none;
+    }
+
+    .app {
+        display: block;
+    }
+
+    .sidebar {
+        border-right: 0;
+
+        border-bottom: 1px solid var(--border);
+    }
+
+    .lesson-list {
+        flex-direction: row;
+
+        overflow-x: auto;
+    }
+
+    .lesson-item {
+        min-width: 180px;
+    }
+
+    .editor {
+        padding: 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="header-left">
+
+        <img
+            src="rogo.png"
+            class="logo"
+            alt="Proglight"
+        >
+
+        <div>
+
+            <div class="logo-title">
+                Proglight
+            </div>
+
+            <div class="logo-subtitle">
+                data.json Generator
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <button
+            class="btn btn-secondary"
+            onclick="importJSON()"
+        >
+            JSONを読み込む
+        </button>
+
+
+        <button
+            class="btn btn-secondary"
+            onclick="copyJSON()"
+        >
+            コピー
+        </button>
+
+
+        <button
+            class="btn btn-primary"
+            onclick="downloadJSON()"
+        >
+            DL
+        </button>
+
+
+        <input
+            type="file"
+            id="jsonFile"
+            accept=".json,application/json"
+            hidden
+        >
+
+    </div>
+
+</header>
+
+
+
+<div class="app">
+
+
+    <!-- ==================================
+         Sidebar
+    ================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+            LESSONS
+        </div>
+
+
+        <div
+            class="lesson-list"
+            id="lessonList"
+        ></div>
+
+
+        <button
+            class="btn btn-primary"
+            style="width:100%;margin-top:14px"
+            onclick="addLesson()"
+        >
+            ＋ Lessonを追加
+        </button>
+
+    </aside>
+
+
+
+    <!-- ==================================
+         Editor
+    ================================== -->
+
+    <main class="editor">
+
+        <h1 class="page-title">
+            data.jsonを作成
+        </h1>
+
+
+        <p class="page-description">
+            Proglightの教材データをGUIで作成・編集できます。
+        </p>
+
+
+
+        <!-- Course -->
+
+        <section class="card">
+
+            <h2 class="card-title">
+                コース情報
+            </h2>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        コースID
+                    </label>
+
+                    <input
+                        id="courseId"
+                        value="html"
+                        oninput="updateCourse()"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        コースタイトル
+                    </label>
+
+                    <input
+                        id="courseTitle"
+                        value="HTML・CSS・JavaScript講座"
+                        oninput="updateCourse()"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    コース説明
+                </label>
+
+                <textarea
+                    id="courseDescription"
+                    oninput="updateCourse()"
+                >Webサイト制作の基礎から本格的なWebアプリ開発まで学ぶ講座です。</textarea>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Lesson -->
+
+        <section
+            class="card"
+            id="lessonEditor"
+        ></section>
+
+    </main>
+
+
+
+    <!-- ==================================
+         JSON Preview
+    ================================== -->
+
+    <aside class="preview">
+
+        <div class="preview-header">
+
+            <div class="preview-title">
+                data.json
+            </div>
+
+
+            <div class="preview-actions">
+
+                <button
+                    class="preview-btn"
+                    onclick="copyJSON()"
+                >
+                    コピー
+                </button>
+
+
+                <button
+                    class="preview-btn"
+                    onclick="downloadJSON()"
+                >
+                    DL
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <textarea
+            id="jsonOutput"
+            readonly
+        ></textarea>
+
+    </aside>
+
+</div>
+
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+
+<script>
+
+/* =====================================================
+   Proglight data.json Generator
+===================================================== */
+
+
+/* =====================================================
+   初期データ
+===================================================== */
+
+let data = {
+
+    course: {
+
+        id: "html",
+
+        title: "HTML・CSS・JavaScript講座",
+
+        description:
+            "Webサイト制作の基礎から本格的なWebアプリ開発まで学ぶ講座です。"
+
+    },
+
+
+    lessons: [
+
+        {
+
+            id: 1,
+
+            category: "入門編",
+
+            title: "Webサイトとプログラミング",
+
+            slides: [
+
+                {
+
+                    type: "title",
+
+                    title: "Webサイトとプログラミング",
+
+                    text:
+                        "Webサイトとプログラミングの基本を学びます。"
+
+                },
+
+                {
+
+                    type: "content",
+
+                    title: "Webサイトとは？",
+
+                    text:
+                        "Webサイトはインターネット上で公開されているページです。",
+
+                    list: [
+                        "HTMLで構造を作る",
+                        "CSSでデザインする",
+                        "JavaScriptで動きを作る"
+                    ]
+
+                },
+
+                {
+
+                    type: "code",
+
+                    title: "HTMLの例",
+
+                    language: "html",
+
+                    code:
+                        "<h1>Hello World</h1>\n<p>こんにちは！</p>"
+
+                },
+
+                {
+
+                    type: "flow",
+
+                    title: "Webサイトが表示される流れ",
+
+                    steps: [
+                        "ブラウザを開く",
+                        "URLを入力する",
+                        "サーバーへアクセスする",
+                        "データを受け取る",
+                        "Webページが表示される"
+                    ]
+
+                },
+
+                {
+
+                    type: "comparison",
+
+                    title: "HTML・CSS・JavaScript",
+
+                    items: [
+
+                        {
+
+                            name: "HTML",
+
+                            role: "Webページの構造を作る",
+
+                            example: "見出し・文章・画像など"
+
+                        },
+
+                        {
+
+                            name: "CSS",
+
+                            role: "Webページのデザインを作る",
+
+                            example: "色・サイズ・レイアウトなど"
+
+                        },
+
+                        {
+
+                            name: "JavaScript",
+
+                            role: "Webページに動きや機能を追加する",
+
+                            example: "クリック・ゲーム・アプリなど"
+
+                        }
+
+                    ]
+
+                },
+
+                {
+
+                    type: "summary",
+
+                    title: "まとめ",
+
+                    list: [
+                        "HTMLは構造",
+                        "CSSはデザイン",
+                        "JavaScriptは動き"
+                    ]
+
+                },
+
+                {
+
+                    type: "end",
+
+                    title: "Lesson 1 完了！",
+
+                    text:
+                        "Webサイトとプログラミングの基本を学びました。",
+
+                    next:
+                        "次は「開発環境とファイル」を学びます。"
+
+                }
+
+            ]
+
+        }
+
+    ]
+
+};
+
+
+/* =====================================================
+   選択Lesson
+===================================================== */
+
+let selectedLessonIndex = 0;
+
+
+/* =====================================================
+   初期描画
+===================================================== */
+
+renderAll();
+
+
+/* =====================================================
+   Course更新
+===================================================== */
+
+function updateCourse() {
+
+    data.course.id =
+        document.getElementById("courseId").value;
+
+
+    data.course.title =
+        document.getElementById("courseTitle").value;
+
+
+    data.course.description =
+        document.getElementById("courseDescription").value;
+
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Lesson一覧
+===================================================== */
+
+function renderLessonList() {
+
+    const container =
+        document.getElementById("lessonList");
+
+
+    container.innerHTML = "";
+
+
+    data.lessons.forEach(
+        (lesson, index) => {
+
+            const item =
+                document.createElement("div");
+
+
+            item.className =
+                "lesson-item" +
+                (
+                    index === selectedLessonIndex
+                        ? " active"
+                        : ""
+                );
+
+
+            item.onclick = () => {
+
+                selectedLessonIndex =
+                    index;
+
+                renderAll();
+
+            };
+
+
+            const number =
+                document.createElement("span");
+
+            number.className =
+                "lesson-number";
+
+            number.textContent =
+                lesson.id;
+
+
+            const title =
+                document.createElement("span");
+
+            title.className =
+                "lesson-title";
+
+            title.textContent =
+                lesson.title ||
+                "無題のLesson";
+
+
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.className =
+                "lesson-delete";
+
+            deleteButton.textContent =
+                "×";
+
+
+            deleteButton.onclick =
+                event => {
+
+                    event.stopPropagation();
+
+                    deleteLesson(index);
+
+                };
+
+
+            item.appendChild(number);
+
+            item.appendChild(title);
+
+            item.appendChild(deleteButton);
+
+
+            container.appendChild(item);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Lesson Editor
+===================================================== */
+
+function renderLessonEditor() {
+
+    const container =
+        document.getElementById(
+            "lessonEditor"
+        );
+
+
+    if (!data.lessons.length) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                Lessonがありません。
+
+                <br><br>
+
+                「Lessonを追加」から作成してください。
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const lesson =
+        data.lessons[
+            selectedLessonIndex
+        ];
+
+
+    container.innerHTML = `
+
+        <h2 class="card-title">
+            Lesson ${lesson.id}
+        </h2>
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+                    Lesson番号
+                </label>
+
+                <input
+                    type="number"
+                    value="${lesson.id}"
+                    onchange="changeLessonId(this.value)"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    カテゴリ
+                </label>
+
+                <input
+                    value="${escapeAttribute(
+                        lesson.category || ""
+                    )}"
+                    oninput="changeLessonField(
+                        'category',
+                        this.value
+                    )"
+                    placeholder="入門編"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Lessonタイトル
+            </label>
+
+            <input
+                value="${escapeAttribute(
+                    lesson.title || ""
+                )}"
+                oninput="changeLessonField(
+                    'title',
+                    this.value
+                )"
+                placeholder="HTML基本タグ"
+            >
+
+        </div>
+
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:28px;
+            margin-bottom:15px;
+        ">
+
+            <h3 style="margin:0;font-size:16px;">
+                スライド
+            </h3>
+
+
+            <button
+                class="btn btn-primary"
+                onclick="addSlide()"
+            >
+                ＋ スライドを追加
+            </button>
+
+        </div>
+
+
+        <div id="slidesContainer"></div>
+
+    `;
+
+
+    renderSlides();
+
+}
+
+
+/* =====================================================
+   Lessonフィールド変更
+===================================================== */
+
+function changeLessonField(
+    field,
+    value
+) {
+
+    data.lessons[
+        selectedLessonIndex
+    ][field] = value;
+
+
+    renderLessonList();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Lesson ID変更
+===================================================== */
+
+function changeLessonId(value) {
+
+    data.lessons[
+        selectedLessonIndex
+    ].id =
+        Number(value) || 1;
+
+
+    renderLessonList();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Slides
+===================================================== */
+
+function renderSlides() {
+
+    const container =
+        document.getElementById(
+            "slidesContainer"
+        );
+
+
+    if (!container) return;
+
+
+    const lesson =
+        data.lessons[
+            selectedLessonIndex
+        ];
+
+
+    container.innerHTML = "";
+
+
+    if (!lesson.slides.length) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                スライドがありません。
+
+                <br>
+
+                「スライドを追加」してください。
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    lesson.slides.forEach(
+        (slide, index) => {
+
+            container.appendChild(
+                createSlideEditor(
+                    slide,
+                    index
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Slide Editor
+===================================================== */
+
+function createSlideEditor(
+    slide,
+    index
+) {
+
+    const wrapper =
+        document.createElement("div");
+
+
+    wrapper.className =
+        "slide-editor";
+
+
+    wrapper.innerHTML = `
+
+        <div class="slide-header">
+
+            <div class="slide-header-left">
+
+                <span class="slide-number">
+                    ${index + 1}
+                </span>
+
+                <span class="slide-type">
+                    ${slide.type}
+                </span>
+
+            </div>
+
+
+            <div class="slide-actions">
+
+                <button
+                    class="icon-btn"
+                    title="上へ"
+                    onclick="moveSlide(
+                        ${index},
+                        -1
+                    )"
+                >
+                    ↑
+                </button>
+
+
+                <button
+                    class="icon-btn"
+                    title="下へ"
+                    onclick="moveSlide(
+                        ${index},
+                        1
+                    )"
+                >
+                    ↓
+                </button>
+
+
+                <button
+                    class="icon-btn delete"
+                    title="削除"
+                    onclick="deleteSlide(
+                        ${index}
+                    )"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                スライドタイプ
+            </label>
+
+            <select
+                onchange="changeSlideType(
+                    ${index},
+                    this.value
+                )"
+            >
+
+                <option
+                    value="title"
+                    ${slide.type === "title"
+                        ? "selected"
+                        : ""}
+                >
+                    title
+                </option>
+
+                <option
+                    value="content"
+                    ${slide.type === "content"
+                        ? "selected"
+                        : ""}
+                >
+                    content
+                </option>
+
+                <option
+                    value="code"
+                    ${slide.type === "code"
+                        ? "selected"
+                        : ""}
+                >
+                    code
+                </option>
+
+                <option
+                    value="flow"
+                    ${slide.type === "flow"
+                        ? "selected"
+                        : ""}
+                >
+                    flow
+                </option>
+
+                <option
+                    value="comparison"
+                    ${slide.type === "comparison"
+                        ? "selected"
+                        : ""}
+                >
+                    comparison
+                </option>
+
+                <option
+                    value="summary"
+                    ${slide.type === "summary"
+                        ? "selected"
+                        : ""}
+                >
+                    summary
+                </option>
+
+                <option
+                    value="end"
+                    ${slide.type === "end"
+                        ? "selected"
+                        : ""}
+                >
+                    end
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                タイトル
+            </label>
+
+            <input
+                value="${escapeAttribute(
+                    slide.title || ""
+                )}"
+                oninput="changeSlideField(
+                    ${index},
+                    'title',
+                    this.value
+                )"
+            >
+
+        </div>
+
+    `;
+
+
+    /* text */
+
+    if (
+        slide.type === "title" ||
+        slide.type === "content" ||
+        slide.type === "end"
+    ) {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    本文
+                </label>
+
+                <textarea
+                    oninput="changeSlideField(
+                        ${index},
+                        'text',
+                        this.value
+                    )"
+                >${escapeHTML(
+                    slide.text || ""
+                )}</textarea>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* list */
+
+    if (
+        slide.type === "content" ||
+        slide.type === "summary"
+    ) {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    箇条書き
+                </label>
+
+                <div
+                    class="array-editor"
+                    id="list-${index}"
+                ></div>
+
+
+                <button
+                    class="btn btn-secondary array-add"
+                    onclick="addArrayItem(
+                        ${index},
+                        'list'
+                    )"
+                >
+                    ＋ 項目を追加
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* code */
+
+    if (slide.type === "code") {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    言語
+                </label>
+
+                <input
+                    value="${escapeAttribute(
+                        slide.language || "html"
+                    )}"
+                    oninput="changeSlideField(
+                        ${index},
+                        'language',
+                        this.value
+                    )"
+                    placeholder="html"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    コード
+                </label>
+
+                <textarea
+                    class="code-input"
+                    oninput="changeSlideField(
+                        ${index},
+                        'code',
+                        this.value
+                    )"
+                >${escapeHTML(
+                    slide.code || ""
+                )}</textarea>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* flow */
+
+    if (slide.type === "flow") {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    手順
+                </label>
+
+                <div
+                    class="array-editor"
+                    id="steps-${index}"
+                ></div>
+
+
+                <button
+                    class="btn btn-secondary array-add"
+                    onclick="addArrayItem(
+                        ${index},
+                        'steps'
+                    )"
+                >
+                    ＋ 手順を追加
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* comparison */
+
+    if (slide.type === "comparison") {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    比較項目
+                </label>
+
+                <div
+                    id="comparison-${index}"
+                ></div>
+
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="addComparison(
+                        ${index}
+                    )"
+                >
+                    ＋ 比較項目を追加
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* end */
+
+    if (slide.type === "end") {
+
+        wrapper.innerHTML += `
+
+            <div class="form-group">
+
+                <label>
+                    次の講座について
+                </label>
+
+                <input
+                    value="${escapeAttribute(
+                        slide.next || ""
+                    )}"
+                    oninput="changeSlideField(
+                        ${index},
+                        'next',
+                        this.value
+                    )"
+                    placeholder="次は「開発環境とファイル」を学びます。"
+                >
+
+            </div>
+
+        `;
+
+    }
+
+
+    setTimeout(() => {
+
+        if (
+            slide.type === "content" ||
+            slide.type === "summary"
+        ) {
+
+            renderArrayEditor(
+                index,
+                "list"
+            );
+
+        }
+
+
+        if (slide.type === "flow") {
+
+            renderArrayEditor(
+                index,
+                "steps"
+            );
+
+        }
+
+
+        if (slide.type === "comparison") {
+
+            renderComparisonEditor(
+                index
+            );
+
+        }
+
+    }, 0);
+
+
+    return wrapper;
+
+}
+
+
+/* =====================================================
+   Slide field
+===================================================== */
+
+function changeSlideField(
+    slideIndex,
+    field,
+    value
+) {
+
+    data.lessons[
+        selectedLessonIndex
+    ].slides[
+        slideIndex
+    ][field] = value;
+
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Slide Type
+===================================================== */
+
+function changeSlideType(
+    index,
+    type
+) {
+
+    const oldSlide =
+        data.lessons[
+            selectedLessonIndex
+        ].slides[index];
+
+
+    const newSlide = {
+
+        type: type,
+
+        title:
+            oldSlide.title || ""
+
+    };
+
+
+    if (
+        type === "title" ||
+        type === "content" ||
+        type === "end"
+    ) {
+
+        newSlide.text =
+            oldSlide.text || "";
+
+    }
+
+
+    if (
+        type === "content" ||
+        type === "summary"
+    ) {
+
+        newSlide.list =
+            Array.isArray(oldSlide.list)
+                ? oldSlide.list
+                : [];
+
+    }
+
+
+    if (type === "code") {
+
+        newSlide.language =
+            oldSlide.language || "html";
+
+        newSlide.code =
+            oldSlide.code || "";
+
+    }
+
+
+    if (type === "flow") {
+
+        newSlide.steps =
+            Array.isArray(oldSlide.steps)
+                ? oldSlide.steps
+                : [];
+
+    }
+
+
+    if (type === "comparison") {
+
+        newSlide.items =
+            Array.isArray(oldSlide.items)
+                ? oldSlide.items
+                : [];
+
+    }
+
+
+    if (type === "end") {
+
+        newSlide.next =
+            oldSlide.next || "";
+
+    }
+
+
+    data.lessons[
+        selectedLessonIndex
+    ].slides[index] =
+        newSlide;
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Add Slide
+===================================================== */
+
+function addSlide() {
+
+    const lesson =
+        data.lessons[
+            selectedLessonIndex
+        ];
+
+
+    lesson.slides.push({
+
+        type: "content",
+
+        title: "新しいスライド",
+
+        text: "",
+
+        list: []
+
+    });
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Delete Slide
+===================================================== */
+
+function deleteSlide(index) {
+
+    const lesson =
+        data.lessons[
+            selectedLessonIndex
+        ];
+
+
+    if (
+        lesson.slides.length <= 1
+    ) {
+
+        alert(
+            "Lessonには最低1つのスライドが必要です。"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            "このスライドを削除しますか？"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    lesson.slides.splice(
+        index,
+        1
+    );
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Move Slide
+===================================================== */
+
+function moveSlide(
+    index,
+    direction
+) {
+
+    const lesson =
+        data.lessons[
+            selectedLessonIndex
+        ];
+
+
+    const newIndex =
+        index + direction;
+
+
+    if (
+        newIndex < 0 ||
+        newIndex >= lesson.slides.length
+    ) {
+
+        return;
+
+    }
+
+
+    [
+        lesson.slides[index],
+        lesson.slides[newIndex]
+    ] =
+    [
+        lesson.slides[newIndex],
+        lesson.slides[index]
+    ];
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Array Editor
+===================================================== */
+
+function renderArrayEditor(
+    slideIndex,
+    field
+) {
+
+    const container =
+        document.getElementById(
+            `${field}-${slideIndex}`
+        );
+
+
+    if (!container) return;
+
+
+    const slide =
+        data.lessons[
+            selectedLessonIndex
+        ].slides[slideIndex];
+
+
+    if (
+        !Array.isArray(
+            slide[field]
+        )
+    ) {
+
+        slide[field] = [];
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    slide[field].forEach(
+        (item, index) => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "array-row";
+
+
+            const input =
+                document.createElement(
+                    "input"
+                );
+
+
+            input.value =
+                item;
+
+
+            input.oninput =
+                event => {
+
+                    slide[field][index] =
+                        event.target.value;
+
+                    updateJSON();
+
+                };
+
+
+            const remove =
+                document.createElement(
+                    "button"
+                );
+
+
+            remove.className =
+                "btn btn-danger";
+
+
+            remove.textContent =
+                "×";
+
+
+            remove.onclick =
+                () => {
+
+                    slide[field].splice(
+                        index,
+                        1
+                    );
+
+                    renderLessonEditor();
+
+                    updateJSON();
+
+                };
+
+
+            row.appendChild(input);
+
+            row.appendChild(remove);
+
+            container.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Add Array Item
+===================================================== */
+
+function addArrayItem(
+    slideIndex,
+    field
+) {
+
+    const slide =
+        data.lessons[
+            selectedLessonIndex
+        ].slides[slideIndex];
+
+
+    if (
+        !Array.isArray(
+            slide[field]
+        )
+    ) {
+
+        slide[field] = [];
+
+    }
+
+
+    slide[field].push("");
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Comparison
+===================================================== */
+
+function renderComparisonEditor(
+    slideIndex
+) {
+
+    const container =
+        document.getElementById(
+            `comparison-${slideIndex}`
+        );
+
+
+    if (!container) return;
+
+
+    const slide =
+        data.lessons[
+            selectedLessonIndex
+        ].slides[slideIndex];
+
+
+    if (
+        !Array.isArray(slide.items)
+    ) {
+
+        slide.items = [];
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    slide.items.forEach(
+        (item, index) => {
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+
+            wrapper.className =
+                "comparison-item";
+
+
+            wrapper.innerHTML = `
+
+                <div
+                    class="comparison-item-header"
+                >
+
+                    <span>
+                        比較項目 ${index + 1}
+                    </span>
+
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="deleteComparison(
+                            ${slideIndex},
+                            ${index}
+                        )"
+                    >
+                        削除
+                    </button>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            名前
+                        </label>
+
+                        <input
+                            value="${escapeAttribute(
+                                item.name || ""
+                            )}"
+                            oninput="changeComparison(
+                                ${slideIndex},
+                                ${index},
+                                'name',
+                                this.value
+                            )"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            役割
+                        </label>
+
+                        <input
+                            value="${escapeAttribute(
+                                item.role || ""
+                            )}"
+                            oninput="changeComparison(
+                                ${slideIndex},
+                                ${index},
+                                'role',
+                                this.value
+                            )"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        例
+                    </label>
+
+                    <input
+                        value="${escapeAttribute(
+                            item.example || ""
+                        )}"
+                        oninput="changeComparison(
+                            ${slideIndex},
+                            ${index},
+                            'example',
+                            this.value
+                        )"
+                    >
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                wrapper
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Add Comparison
+===================================================== */
+
+function addComparison(
+    slideIndex
+) {
+
+    const slide =
+        data.lessons[
+            selectedLessonIndex
+        ].slides[slideIndex];
+
+
+    if (
+        !Array.isArray(slide.items)
+    ) {
+
+        slide.items = [];
+
+    }
+
+
+    slide.items.push({
+
+        name: "",
+
+        role: "",
+
+        example: ""
+
+    });
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Change Comparison
+===================================================== */
+
+function changeComparison(
+    slideIndex,
+    itemIndex,
+    field,
+    value
+) {
+
+    data.lessons[
+        selectedLessonIndex
+    ].slides[
+        slideIndex
+    ].items[
+        itemIndex
+    ][field] =
+        value;
+
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Delete Comparison
+===================================================== */
+
+function deleteComparison(
+    slideIndex,
+    itemIndex
+) {
+
+    data.lessons[
+        selectedLessonIndex
+    ].slides[
+        slideIndex
+    ].items.splice(
+        itemIndex,
+        1
+    );
+
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Add Lesson
+===================================================== */
+
+function addLesson() {
+
+    const maxId =
+        data.lessons.length
+            ? Math.max(
+                ...data.lessons.map(
+                    lesson =>
+                        Number(lesson.id) || 0
+                )
+            )
+            : 0;
+
+
+    data.lessons.push({
+
+        id: maxId + 1,
+
+        category: "入門編",
+
+        title: "新しいLesson",
+
+        slides: [
+
+            {
+
+                type: "title",
+
+                title: "新しいLesson",
+
+                text: ""
+
+            },
+
+            {
+
+                type: "content",
+
+                title: "内容",
+
+                text: "",
+
+                list: []
+
+            },
+
+            {
+
+                type: "end",
+
+                title: "Lesson完了！",
+
+                text: "",
+
+                next: ""
+
+            }
+
+        ]
+
+    });
+
+
+    selectedLessonIndex =
+        data.lessons.length - 1;
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   Delete Lesson
+===================================================== */
+
+function deleteLesson(index) {
+
+    if (
+        data.lessons.length <= 1
+    ) {
+
+        alert(
+            "Lessonは最低1つ必要です。"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !confirm(
+            `Lesson ${data.lessons[index].id} を削除しますか？`
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    data.lessons.splice(
+        index,
+        1
+    );
+
+
+    if (
+        selectedLessonIndex >=
+        data.lessons.length
+    ) {
+
+        selectedLessonIndex =
+            data.lessons.length - 1;
+
+    }
+
+
+    renderAll();
+
+}
+
+
+/* =====================================================
+   JSON Update
+===================================================== */
+
+function updateJSON() {
+
+    const output =
+        document.getElementById(
+            "jsonOutput"
+        );
+
+
+    output.value =
+        JSON.stringify(
+            data,
+            null,
+            2
+        );
+
+}
+
+
+/* =====================================================
+   JSON Copy
+===================================================== */
+
+async function copyJSON() {
+
+    const json =
+        JSON.stringify(
+            data,
+            null,
+            2
+        );
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            json
+        );
+
+        showToast(
+            "JSONをコピーしました ✓"
+        );
+
+    }
+
+    catch (error) {
+
+        const output =
+            document.getElementById(
+                "jsonOutput"
+            );
+
+
+        output.removeAttribute(
+            "readonly"
+        );
+
+
+        output.focus();
+
+        output.select();
+
+
+        document.execCommand(
+            "copy"
+        );
+
+
+        output.setAttribute(
+            "readonly",
+            ""
+        );
+
+
+        showToast(
+            "JSONをコピーしました ✓"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   JSON Download
+===================================================== */
+
+function downloadJSON() {
+
+    const json =
+        JSON.stringify(
+            data,
+            null,
+            2
+        );
+
+
+    const blob =
+        new Blob(
+            [json],
+            {
+                type:
+                    "application/json;charset=utf-8"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const a =
+        document.createElement(
+            "a"
+        );
+
+
+    a.href =
+        url;
+
+
+    a.download =
+        "data.json";
+
+
+    document.body.appendChild(a);
+
+
+    a.click();
+
+
+    a.remove();
+
+
+    URL.revokeObjectURL(url);
+
+
+    showToast(
+        "data.jsonを保存しました ✓"
+    );
+
+}
+
+
+/* =====================================================
+   JSON Import
+===================================================== */
+
+function importJSON() {
+
+    document
+        .getElementById("jsonFile")
+        .click();
+
+}
+
+
+document
+    .getElementById("jsonFile")
+    .addEventListener(
+        "change",
+        event => {
+
+            const file =
+                event.target.files[0];
+
+
+            if (!file) return;
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => {
+
+                    try {
+
+                        const parsed =
+                            JSON.parse(
+                                reader.result
+                            );
+
+
+                        validateJSON(
+                            parsed
+                        );
+
+
+                        data =
+                            parsed;
+
+
+                        selectedLessonIndex =
+                            0;
+
+
+                        renderAll();
+
+
+                        showToast(
+                            "JSONを読み込みました ✓"
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        alert(
+                            "JSONの読み込みに失敗しました。\n\n" +
+                            error.message
+                        );
+
+                    }
+
+                };
+
+
+            reader.readAsText(
+                file,
+                "UTF-8"
+            );
+
+
+            event.target.value = "";
+
+        }
+    );
+
+
+/* =====================================================
+   Validate JSON
+===================================================== */
+
+function validateJSON(json) {
+
+    if (
+        !json ||
+        typeof json !== "object"
+    ) {
+
+        throw new Error(
+            "JSONの形式が正しくありません。"
+        );
+
+    }
+
+
+    if (
+        !json.course ||
+        typeof json.course !== "object"
+    ) {
+
+        throw new Error(
+            "courseがありません。"
+        );
+
+    }
+
+
+    if (
+        !Array.isArray(
+            json.lessons
+        )
+    ) {
+
+        throw new Error(
+            "lessonsが配列になっていません。"
+        );
+
+    }
+
+
+    json.lessons.forEach(
+        lesson => {
+
+            if (
+                lesson.id === undefined
+            ) {
+
+                throw new Error(
+                    "Lessonにidがありません。"
+                );
+
+            }
+
+
+            if (
+                !Array.isArray(
+                    lesson.slides
+                )
+            ) {
+
+                throw new Error(
+                    `Lesson ${lesson.id} のslidesがありません。`
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Sync Course
+===================================================== */
+
+function syncCourseForm() {
+
+    document.getElementById(
+        "courseId"
+    ).value =
+        data.course.id || "";
+
+
+    document.getElementById(
+        "courseTitle"
+    ).value =
+        data.course.title || "";
+
+
+    document.getElementById(
+        "courseDescription"
+    ).value =
+        data.course.description || "";
+
+}
+
+
+/* =====================================================
+   Render All
+===================================================== */
+
+function renderAll() {
+
+    syncCourseForm();
+
+    renderLessonList();
+
+    renderLessonEditor();
+
+    updateJSON();
+
+}
+
+
+/* =====================================================
+   Toast
+===================================================== */
+
+function showToast(
+    message
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.classList.remove(
+                "show"
+            );
+
+        },
+        1800
+    );
+
+}
+
+
+/* =====================================================
+   Escape HTML
+===================================================== */
+
+function escapeHTML(
+    value
+) {
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        );
+
+}
+
+
+/* =====================================================
+   Escape Attribute
+===================================================== */
+
+function escapeAttribute(
+    value
+) {
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        );
+
+}
+
+</script>
+
+</body>
+</html>
