@@ -1,276 +1,129 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proglight - data.json Editor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proglight data.json Editor</title>
 <style>
-:root{
-  --bg:#f5f7fb;--surface:#fff;--surface2:#f8fafc;--text:#111827;
-  --muted:#64748b;--border:#e2e8f0;--accent:#111827;--accent2:#334155;
-  --danger:#dc2626;--danger-bg:#fef2f2;--code:#0f172a;--codeText:#e2e8f0;
-  --shadow:0 8px 30px rgba(15,23,42,.06);--radius:16px;
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-header{
- position:sticky;top:0;z-index:50;height:68px;padding:0 22px;background:rgba(255,255,255,.92);
- backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between
-}
-.brand{display:flex;align-items:center;gap:11px}.brand img{width:40px;height:40px;object-fit:contain;border-radius:10px}
-.brand strong{display:block;font-size:17px}.brand span{font-size:11px;color:var(--muted)}
-.actions{display:flex;gap:7px;align-items:center}
-.btn{border:0;border-radius:10px;padding:9px 13px;font-weight:700;font-size:13px;transition:.18s}
-.btn:hover{transform:translateY(-1px)}.primary{background:var(--accent);color:#fff}.secondary{background:#eef2f7;color:var(--text)}
-.danger{background:var(--danger-bg);color:var(--danger)}
-.layout{display:grid;grid-template-columns:250px minmax(0,1fr) 390px;min-height:calc(100vh - 68px)}
-.sidebar{padding:18px;background:#fafbfc;border-right:1px solid var(--border);overflow:auto}
-.side-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.side-top b{font-size:12px;letter-spacing:.08em;color:var(--muted)}
-.lesson-list{display:flex;flex-direction:column;gap:7px}
-.lesson{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--border);border-radius:11px;background:#fff;cursor:pointer}
-.lesson.active{border-color:#94a3b8;background:#f1f5f9}.lesson-num{width:27px;height:27px;display:grid;place-items:center;border-radius:8px;background:#e2e8f0;font-size:11px;font-weight:800}
-.lesson.active .lesson-num{background:#111827;color:#fff}.lesson-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700}
-.editor{padding:28px;min-width:0;overflow:auto}.top-title{margin:0;font-size:25px}.sub{margin:5px 0 22px;color:var(--muted);font-size:13px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:17px}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}.card h2{font-size:16px;margin:0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:14px}.field:last-child{margin-bottom:0}
-label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
-input,textarea,select{width:100%;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--text);padding:10px 11px;outline:0}
-input:focus,textarea:focus,select:focus{border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.15)}
-textarea{min-height:100px;resize:vertical}.code{min-height:210px;background:var(--code);color:var(--codeText);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-.slide{border:1px solid var(--border);border-radius:13px;padding:15px;background:var(--surface2);margin-bottom:10px}
-.slide-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
-.slide-left{display:flex;align-items:center;gap:8px}.badge{font-size:10px;font-weight:800;background:#e2e8f0;padding:5px 8px;border-radius:999px}
-.slide-no{width:28px;height:28px;display:grid;place-items:center;background:#111827;color:#fff;border-radius:8px;font-size:11px;font-weight:800}
-.slide-tools{display:flex;gap:4px}.icon{border:0;background:#fff;border-radius:8px;width:29px;height:29px;font-weight:800}.icon.del{color:var(--danger)}
-.array{display:flex;flex-direction:column;gap:7px}.array-row{display:flex;gap:6px}.array-row input{flex:1}
-.comparison{border:1px solid var(--border);border-radius:10px;background:#fff;padding:12px;margin-bottom:8px}
-.comparison-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;font-size:12px;font-weight:800}
-.preview{background:var(--code);padding:16px;display:flex;flex-direction:column;min-width:0}
-.preview-head{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:10px}.preview-title{font-weight:800;font-size:13px}.preview-actions{display:flex;gap:6px}
-.preview button{border:0;border-radius:8px;background:#1e293b;color:#fff;padding:8px 10px;font-size:11px;font-weight:800}
-#output{flex:1;min-height:400px;border:0;border-radius:11px;background:#111827;color:#e2e8f0;padding:15px;resize:none;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;outline:0}
-.empty{border:1px dashed var(--border);border-radius:11px;padding:28px;text-align:center;color:var(--muted);font-size:13px}
-.toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:11px 15px;border-radius:10px;font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;transform:none}
-.hidden{display:none!important}
-@media(max-width:1200px){.layout{grid-template-columns:220px minmax(0,1fr)}.preview{display:none}}
-@media(max-width:720px){header{padding:0 12px}.actions .secondary.import{display:none}.brand span{display:none}.layout{display:block}.sidebar{border-right:0;border-bottom:1px solid var(--border)}.lesson-list{flex-direction:row;overflow:auto}.lesson{min-width:170px}.editor{padding:17px}.grid{grid-template-columns:1fr}}
+:root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#64748b;--border:#e2e8f0;--dark:#0f172a;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+header{height:68px;position:sticky;top:0;z-index:10;background:#fffffff2;backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.brand{display:flex;align-items:center;gap:10px}.brand img{width:40px;height:40px;object-fit:contain}.brand b{display:block}.brand small{color:var(--muted)}
+.actions{display:flex;gap:7px}.btn{border:0;border-radius:10px;padding:9px 13px;font-weight:700;cursor:pointer}.primary{background:#111827;color:white}.secondary{background:#eef2f7}.danger{background:#fef2f2;color:var(--danger)}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr) 390px;min-height:calc(100vh - 68px)}
+.sidebar{padding:16px;border-right:1px solid var(--border);background:#fafafa}.sidehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sidehead span{font-size:12px;font-weight:800;color:var(--muted)}
+.lesson{display:flex;align-items:center;gap:8px;padding:10px;margin-bottom:7px;background:white;border:1px solid var(--border);border-radius:11px;cursor:pointer}.lesson.active{background:#f1f5f9;border-color:#94a3b8}.num{width:28px;height:28px;border-radius:8px;background:#e2e8f0;display:grid;place-items:center;font-size:11px;font-weight:800}.active .num{background:#111827;color:white}.lname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:700}
+.editor{padding:28px;min-width:0}.editor h1{margin:0;font-size:25px}.sub{color:var(--muted);font-size:13px;margin:6px 0 22px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.head h2{font-size:16px;margin:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{margin-bottom:13px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
+input,textarea,select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:9px;background:white;color:var(--text);font:inherit;outline:none}textarea{min-height:100px;resize:vertical}.code{min-height:210px;background:var(--dark);color:white;font-family:monospace}
+.slide{background:#f8fafc;border:1px solid var(--border);border-radius:13px;padding:15px;margin-bottom:10px}.slidehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.slideleft{display:flex;align-items:center;gap:8px}.slideNo{background:#111827;color:white;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:800}.badge{background:#e2e8f0;border-radius:99px;padding:5px 8px;font-size:10px;font-weight:800}.tools{display:flex;gap:4px}.icon{border:0;background:white;border-radius:8px;width:30px;height:30px;font-weight:800;cursor:pointer}.icon.del{color:var(--danger)}
+.array{display:flex;flex-direction:column;gap:7px}.row{display:flex;gap:6px}.row input{flex:1}.cmp{background:white;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}.cmphead{display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:9px}
+.preview{background:var(--dark);padding:16px;display:flex;flex-direction:column}.previewhead{display:flex;justify-content:space-between;align-items:center;color:white;margin-bottom:10px}.preview button{border:0;border-radius:8px;background:#1e293b;color:white;padding:8px 10px;font-size:11px;font-weight:800;cursor:pointer}#out{flex:1;min-height:400px;border:0;border-radius:10px;background:#111827;color:#e2e8f0;padding:14px;font:12px/1.6 monospace;resize:none}
+.status{font-size:11px;color:#16a34a;font-weight:700}.empty{padding:25px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:10px}.toast{position:fixed;right:18px;bottom:18px;background:#111827;color:white;padding:11px 15px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}
+@media(max-width:1200px){.layout{grid-template-columns:220px 1fr}.preview{display:none}}@media(max-width:700px){header{padding:0 10px}.brand small{display:none}.actions .import{display:none}.layout{display:block}.sidebar{border-right:0;border-bottom:1px solid var(--border)}.lesson{display:inline-flex;min-width:170px;margin-right:6px}.lessonlist{overflow:auto;white-space:nowrap}.editor{padding:16px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="brand">
-    <img src="rogo.png" alt="Proglight">
-    <div><strong>Proglight</strong><span>data.json Editor</span></div>
-  </div>
-  <div class="actions">
-    <input id="file" class="hidden" type="file" accept=".json,application/json">
-    <button class="btn secondary import" onclick="document.getElementById('file').click()">JSON読込</button>
-    <button class="btn secondary" onclick="copyJSON()">コピー</button>
-    <button class="btn primary" onclick="downloadJSON()">DL</button>
-  </div>
+<div class="brand"><img src="rogo.png" alt="Proglight"><div><b>Proglight</b><small>data.json Editor</small></div></div>
+<div class="actions">
+<input id="file" type="file" accept=".json,application/json" hidden>
+<button class="btn secondary import" onclick="file.click()">JSON読込</button>
+<button class="btn secondary" onclick="copyJSON()">コピー</button>
+<button class="btn primary" onclick="downloadJSON()">DL</button>
+</div>
 </header>
 
 <div class="layout">
-  <aside class="sidebar">
-    <div class="side-top"><b>LESSONS</b><button class="btn primary" onclick="addLesson()">＋追加</button></div>
-    <div id="lessonList" class="lesson-list"></div>
-  </aside>
+<aside class="sidebar">
+<div class="sidehead"><span>LESSONS</span><button class="btn primary" onclick="addLesson()">＋追加</button></div>
+<div id="lessonList" class="lessonlist"></div>
+<button class="btn danger" style="width:100%;margin-top:8px" onclick="clearSavedData()">🗑 保存データを消去</button>
+</aside>
 
-  <main class="editor">
-    <h1 class="top-title">教材をかんたん作成</h1>
-    <p class="sub">入力するだけで、Proglight用の data.json を作成できます。</p>
+<main class="editor">
+<h1>教材をかんたん作成</h1>
+<p class="sub">編集内容は自動的にブラウザへ保存されます。</p>
 
-    <section class="card">
-      <div class="card-head"><h2>コース情報</h2></div>
-      <div class="grid">
-        <div class="field"><label>コースID</label><input id="courseId" oninput="courseChange()"></div>
-        <div class="field"><label>コースタイトル</label><input id="courseTitle" oninput="courseChange()"></div>
-      </div>
-      <div class="field"><label>説明</label><textarea id="courseDescription" oninput="courseChange()"></textarea></div>
-    </section>
-
-    <section class="card" id="lessonEditor"></section>
-  </main>
-
-  <aside class="preview">
-    <div class="preview-head">
-      <span class="preview-title">生成された data.json</span>
-      <div class="preview-actions">
-        <button onclick="copyJSON()">コピー</button>
-        <button onclick="downloadJSON()">DL</button>
-      </div>
-    </div>
-    <textarea id="output" readonly></textarea>
-  </aside>
+<section class="card">
+<div class="head"><h2>コース情報</h2><span id="status" class="status">● 自動保存中</span></div>
+<div class="grid">
+<div class="field"><label>コースID</label><input id="courseId" oninput="courseChange()"></div>
+<div class="field"><label>コースタイトル</label><input id="courseTitle" oninput="courseChange()"></div>
 </div>
+<div class="field"><label>説明</label><textarea id="courseDescription" oninput="courseChange()"></textarea></div>
+</section>
 
+<section class="card" id="lessonEditor"></section>
+</main>
+
+<aside class="preview">
+<div class="previewhead"><b>data.json</b><div><button onclick="copyJSON()">コピー</button><button onclick="downloadJSON()">DL</button></div></div>
+<textarea id="out" readonly></textarea>
+</aside>
+</div>
 <div id="toast" class="toast"></div>
 
 <script>
-let data={
-  course:{id:"html",title:"HTML・CSS・JavaScript講座",description:"Webサイト制作の基礎から本格的なWebアプリ開発まで学ぶ講座です。"},
-  lessons:[{
-    id:1,category:"入門編",title:"Webサイトとプログラミング",
-    slides:[
-      {type:"title",title:"Webサイトとプログラミング",text:"Webサイトとプログラミングの基本を学びます。"},
-      {type:"content",title:"Webサイトとは？",text:"Webサイトはインターネット上で公開されているページです。",list:["HTMLで構造を作る","CSSでデザインする","JavaScriptで動きを作る"]},
-      {type:"code",title:"HTMLの例",language:"html",code:"<h1>Hello World</h1>\\n<p>こんにちは！</p>"},
-      {type:"flow",title:"Webサイトが表示される流れ",steps:["ブラウザを開く","URLを入力する","サーバーへアクセスする","データを受け取る","Webページが表示される"]},
-      {type:"comparison",title:"HTML・CSS・JavaScript",items:[
-        {name:"HTML",role:"Webページの構造を作る",example:"見出し・文章・画像など"},
-        {name:"CSS",role:"Webページのデザインを作る",example:"色・サイズ・レイアウトなど"},
-        {name:"JavaScript",role:"Webページに動きや機能を追加する",example:"クリック・ゲーム・アプリなど"}]},
-      {type:"summary",title:"まとめ",list:["HTMLは構造","CSSはデザイン","JavaScriptは動き"]},
-      {type:"end",title:"Lesson 1 完了！",text:"Webサイトとプログラミングの基本を学びました。",next:"次は「開発環境とファイル」を学びます。"}
-    ]
-  }]
-};
-let selected=0;
-
+const KEY="proglight_data_generator_data_v2",SEL="proglight_data_generator_selected_v2";
+const initial={course:{id:"html",title:"HTML・CSS・JavaScript講座",description:"Webサイト制作の基礎から本格的なWebアプリ開発まで学ぶ講座です。"},lessons:[{id:1,category:"入門編",title:"Webサイトとプログラミング",slides:[
+{type:"title",title:"Webサイトとプログラミング",text:"Webサイトとプログラミングの基本を学びます。"},
+{type:"content",title:"Webサイトとは？",text:"Webサイトはインターネット上で公開されているページです。",list:["HTMLで構造を作る","CSSでデザインする","JavaScriptで動きを作る"]},
+{type:"code",title:"HTMLの例",language:"html",code:"<h1>Hello World</h1>\n<p>こんにちは！</p>"},
+{type:"end",title:"Lesson 1 完了！",text:"基本を学びました。",next:"次のLessonへ進みましょう。"}]}]};
+let data=load(),selected=Math.min(Number(localStorage.getItem(SEL)||0),Math.max(0,data.lessons.length-1));
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function load(){try{let x=JSON.parse(localStorage.getItem(KEY));if(x?.course&&Array.isArray(x.lessons))return x}catch(e){}return clone(initial)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(SEL,selected);document.getElementById("status").textContent="● 保存済み";setTimeout(()=>document.getElementById("status").textContent="● 自動保存中",600)}catch(e){toast("保存できませんでした")}}
 function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function courseChange(){
- data.course.id=document.getElementById("courseId").value;
- data.course.title=document.getElementById("courseTitle").value;
- data.course.description=document.getElementById("courseDescription").value;
- updateJSON();
+function courseChange(){data.course.id=courseId.value;data.course.title=courseTitle.value;data.course.description=courseDescription.value;update();save()}
+function update(){courseId.value=data.course.id||"";courseTitle.value=data.course.title||"";courseDescription.value=data.course.description||"";renderLessons();renderLesson();out.value=JSON.stringify(data,null,2)}
+function renderLessons(){lessonList.innerHTML="";data.lessons.forEach((l,i)=>{let d=document.createElement("div");d.className="lesson "+(i===selected?"active":"");d.innerHTML=`<span class="num">${l.id}</span><span class="lname">${esc(l.title||"無題")}</span><button class="icon del">×</button>`;d.onclick=()=>{selected=i;update();save()};d.querySelector("button").onclick=e=>{e.stopPropagation();deleteLesson(i)};lessonList.appendChild(d)})}
+function renderLesson(){
+ if(!data.lessons.length){lessonEditor.innerHTML='<div class="empty">Lessonがありません。「＋追加」してください。</div>';return}
+ let l=data.lessons[selected];
+ lessonEditor.innerHTML=`<div class="head"><h2>Lesson ${l.id}</h2><button class="btn danger" onclick="deleteLesson(${selected})">Lesson削除</button></div>
+ <div class="grid"><div class="field"><label>Lesson番号</label><input type="number" value="${l.id}" oninput="lessonField('id',Number(this.value)||1)"></div>
+ <div class="field"><label>カテゴリ</label><input value="${esc(l.category)}" oninput="lessonField('category',this.value)" placeholder="入門編"></div></div>
+ <div class="field"><label>Lessonタイトル</label><input value="${esc(l.title)}" oninput="lessonField('title',this.value)"></div>
+ <div class="head" style="margin-top:20px"><h2>スライド</h2><button class="btn primary" onclick="addSlide()">＋スライド追加</button></div><div id="slides"></div>`;
+ renderSlides()
 }
-function render(){
- document.getElementById("courseId").value=data.course.id||"";
- document.getElementById("courseTitle").value=data.course.title||"";
- document.getElementById("courseDescription").value=data.course.description||"";
- renderLessons();renderEditor();updateJSON();
-}
-function renderLessons(){
- const el=document.getElementById("lessonList");el.innerHTML="";
- data.lessons.forEach((l,i)=>{
-  const d=document.createElement("div");d.className="lesson "+(i===selected?"active":"");
-  d.innerHTML=`<span class="lesson-num">${l.id}</span><span class="lesson-name">${esc(l.title||"無題")}</span><button class="icon del" title="削除">×</button>`;
-  d.onclick=()=>{selected=i;render()};
-  d.querySelector("button").onclick=e=>{e.stopPropagation();deleteLesson(i)};
-  el.appendChild(d);
- });
-}
-function renderEditor(){
- const el=document.getElementById("lessonEditor");
- if(!data.lessons.length){el.innerHTML='<div class="empty">Lessonがありません。左上の「＋追加」から作成してください。</div>';return}
- const l=data.lessons[selected];
- el.innerHTML=`
-  <div class="card-head"><h2>Lesson ${l.id}</h2><button class="btn danger" onclick="deleteLesson(${selected})">Lesson削除</button></div>
-  <div class="grid">
-   <div class="field"><label>Lesson番号</label><input type="number" value="${esc(l.id)}" oninput="lessonField('id',Number(this.value)||1)"></div>
-   <div class="field"><label>カテゴリ</label><input value="${esc(l.category)}" oninput="lessonField('category',this.value)" placeholder="入門編"></div>
-  </div>
-  <div class="field"><label>Lessonタイトル</label><input value="${esc(l.title)}" oninput="lessonField('title',this.value)" placeholder="HTML基本タグ"></div>
-  <div class="card-head" style="margin-top:22px"><h2>スライド</h2><button class="btn primary" onclick="addSlide()">＋スライド追加</button></div>
-  <div id="slides"></div>`;
- renderSlides();
-}
-function lessonField(k,v){data.lessons[selected][k]=v;renderLessons();updateJSON()}
-function renderSlides(){
- const box=document.getElementById("slides");if(!box)return;box.innerHTML="";
- const slides=data.lessons[selected].slides;
- if(!slides.length){box.innerHTML='<div class="empty">スライドがありません。</div>';return}
- slides.forEach((s,i)=>box.appendChild(slideEditor(s,i)));
-}
-function slideEditor(s,i){
- const w=document.createElement("div");w.className="slide";
- w.innerHTML=`
-  <div class="slide-head"><div class="slide-left"><span class="slide-no">${i+1}</span><span class="badge">${s.type}</span></div>
-  <div class="slide-tools"><button class="icon" onclick="moveSlide(${i},-1)">↑</button><button class="icon" onclick="moveSlide(${i},1)">↓</button><button class="icon del" onclick="deleteSlide(${i})">×</button></div></div>
-  <div class="field"><label>タイプ</label><select onchange="slideType(${i},this.value)">
-   ${["title","content","code","flow","comparison","summary","end"].map(x=>`<option value="${x}" ${s.type===x?"selected":""}>${x}</option>`).join("")}
-  </select></div>
-  <div class="field"><label>タイトル</label><input value="${esc(s.title)}" oninput="slideField(${i},'title',this.value)"></div>`;
+function lessonField(k,v){data.lessons[selected][k]=v;update();save()}
+function renderSlides(){let box=document.getElementById("slides");if(!box)return;box.innerHTML="";data.lessons[selected].slides.forEach((s,i)=>box.appendChild(slideUI(s,i)))}
+function slideUI(s,i){
+ let w=document.createElement("div");w.className="slide";
+ w.innerHTML=`<div class="slidehead"><div class="slideleft"><span class="slideNo">${i+1}</span><span class="badge">${s.type}</span></div><div class="tools"><button class="icon" onclick="moveSlide(${i},-1)">↑</button><button class="icon" onclick="moveSlide(${i},1)">↓</button><button class="icon del" onclick="deleteSlide(${i})">×</button></div></div>
+ <div class="field"><label>タイプ</label><select onchange="slideType(${i},this.value)">${["title","content","code","flow","comparison","summary","end"].map(x=>`<option ${s.type===x?"selected":""}>${x}</option>`).join("")}</select></div>
+ <div class="field"><label>タイトル</label><input value="${esc(s.title)}" oninput="slideField(${i},'title',this.value)"></div>`;
  if(["title","content","end"].includes(s.type))w.innerHTML+=`<div class="field"><label>本文</label><textarea oninput="slideField(${i},'text',this.value)">${esc(s.text)}</textarea></div>`;
- if(["content","summary"].includes(s.type))w.innerHTML+=arrayHTML(i,"list","箇条書き");
- if(s.type==="code")w.innerHTML+=`<div class="grid"><div class="field"><label>言語</label><input value="${esc(s.language||"html")}" oninput="slideField(${i},'language',this.value)"></div></div><div class="field"><label>コード</label><textarea class="code" oninput="slideField(${i},'code',this.value)">${esc(s.code)}</textarea></div>`;
- if(s.type==="flow")w.innerHTML+=arrayHTML(i,"steps","手順");
+ if(["content","summary"].includes(s.type))w.innerHTML+=arrayUI(i,"list","箇条書き");
+ if(s.type==="code")w.innerHTML+=`<div class="field"><label>言語</label><input value="${esc(s.language||"html")}" oninput="slideField(${i},'language',this.value)"></div><div class="field"><label>コード</label><textarea class="code" oninput="slideField(${i},'code',this.value)">${esc(s.code)}</textarea></div>`;
+ if(s.type==="flow")w.innerHTML+=arrayUI(i,"steps","手順");
  if(s.type==="comparison")w.innerHTML+=`<div class="field"><label>比較項目</label><div id="cmp${i}"></div><button class="btn secondary" onclick="addCmp(${i})">＋比較項目</button></div>`;
  if(s.type==="end")w.innerHTML+=`<div class="field"><label>次の講座について</label><input value="${esc(s.next)}" oninput="slideField(${i},'next',this.value)"></div>`;
- setTimeout(()=>{if(["content","summary"].includes(s.type))renderArray(i,"list");if(s.type==="flow")renderArray(i,"steps");if(s.type==="comparison")renderCmp(i)},0);
- return w;
+ setTimeout(()=>{if(["content","summary"].includes(s.type))renderArray(i,"list");if(s.type==="flow")renderArray(i,"steps");if(s.type==="comparison")renderCmp(i)},0);return w
 }
-function arrayHTML(i,key,label){return `<div class="field"><label>${label}</label><div class="array" id="${key}${i}"></div><button class="btn secondary" onclick="addArray(${i},'${key}')">＋項目追加</button></div>`}
-function renderArray(i,key){
- const box=document.getElementById(key+i);if(!box)return;box.innerHTML="";
- const arr=data.lessons[selected].slides[i][key]||[];
- arr.forEach((v,j)=>{
-  const row=document.createElement("div");row.className="array-row";
-  row.innerHTML=`<input value="${esc(v)}"><button class="btn danger">×</button>`;
-  row.querySelector("input").oninput=e=>{arr[j]=e.target.value;updateJSON()};
-  row.querySelector("button").onclick=()=>{arr.splice(j,1);renderEditor();updateJSON()};
-  box.appendChild(row);
- });
-}
-function addArray(i,key){let s=data.lessons[selected].slides[i];if(!Array.isArray(s[key]))s[key]=[];s[key].push("");renderEditor();updateJSON()}
-function renderCmp(i){
- const box=document.getElementById("cmp"+i);if(!box)return;box.innerHTML="";
- (data.lessons[selected].slides[i].items||[]).forEach((x,j)=>{
-  const d=document.createElement("div");d.className="comparison";
-  d.innerHTML=`<div class="comparison-head"><span>比較項目 ${j+1}</span><button class="btn danger">削除</button></div>
-  <div class="grid"><div class="field"><label>名前</label><input value="${esc(x.name)}"></div><div class="field"><label>役割</label><input value="${esc(x.role)}"></div></div>
-  <div class="field"><label>例</label><input value="${esc(x.example)}"></div>`;
-  ["name","role","example"].forEach((k,n)=>d.querySelectorAll("input")[n].oninput=e=>{x[k]=e.target.value;updateJSON()});
-  d.querySelector("button").onclick=()=>{data.lessons[selected].slides[i].items.splice(j,1);renderEditor();updateJSON()};
-  box.appendChild(d);
- });
-}
-function addCmp(i){let s=data.lessons[selected].slides[i];if(!Array.isArray(s.items))s.items=[];s.items.push({name:"",role:"",example:""});renderEditor();updateJSON()}
-function slideField(i,k,v){data.lessons[selected].slides[i][k]=v;updateJSON()}
-function slideType(i,type){
- const old=data.lessons[selected].slides[i], n={type,title:old.title||""};
- if(["title","content","end"].includes(type))n.text=old.text||"";
- if(["content","summary"].includes(type))n.list=Array.isArray(old.list)?old.list:[];
- if(type==="code"){n.language=old.language||"html";n.code=old.code||""}
- if(type==="flow")n.steps=Array.isArray(old.steps)?old.steps:[];
- if(type==="comparison")n.items=Array.isArray(old.items)?old.items:[];
- if(type==="end")n.next=old.next||"";
- data.lessons[selected].slides[i]=n;renderEditor();updateJSON();
-}
-function addSlide(){data.lessons[selected].slides.push({type:"content",title:"新しいスライド",text:"",list:[]});renderEditor();updateJSON()}
-function deleteSlide(i){if(data.lessons[selected].slides.length<=1)return alert("最低1つのスライドが必要です。");if(confirm("このスライドを削除しますか？")){data.lessons[selected].slides.splice(i,1);renderEditor();updateJSON()}}
-function moveSlide(i,d){let a=data.lessons[selected].slides,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];renderEditor();updateJSON()}
-function addLesson(){
- const id=data.lessons.length?Math.max(...data.lessons.map(x=>Number(x.id)||0))+1:1;
- data.lessons.push({id,category:"入門編",title:"新しいLesson",slides:[
-  {type:"title",title:"新しいLesson",text:""},
-  {type:"content",title:"内容",text:"",list:[]},
-  {type:"end",title:"Lesson完了！",text:"",next:""}
- ]});
- selected=data.lessons.length-1;render();
-}
-function deleteLesson(i){
- if(data.lessons.length<=1)return alert("最低1つのLessonが必要です。");
- if(!confirm("このLessonを削除しますか？"))return;
- data.lessons.splice(i,1);selected=Math.min(selected,data.lessons.length-1);render();
-}
-function updateJSON(){document.getElementById("output").value=JSON.stringify(data,null,2)}
-async function copyJSON(){
- const text=JSON.stringify(data,null,2);
- try{await navigator.clipboard.writeText(text);toast("JSONをコピーしました ✓")}
- catch(e){const o=document.getElementById("output");o.select();document.execCommand("copy");toast("JSONをコピーしました ✓")}
-}
-function downloadJSON(){
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"});
- const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="data.json";a.click();URL.revokeObjectURL(url);toast("data.jsonを保存しました ✓");
-}
-function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
-document.getElementById("file").addEventListener("change",e=>{
- const f=e.target.files[0];if(!f)return;
- const r=new FileReader();r.onload=()=>{
-  try{
-   const x=JSON.parse(r.result);
-   if(!x.course||!Array.isArray(x.lessons))throw Error("course または lessons がありません。");
-   data=x;selected=0;render();toast("JSONを読み込みました ✓");
-  }catch(err){alert("JSONを読み込めませんでした。\n"+err.message)}
- };r.readAsText(f,"UTF-8");e.target.value="";
-});
-render();
+function arrayUI(i,k,label){return `<div class="field"><label>${label}</label><div class="array" id="${k}${i}"></div><button class="btn secondary" onclick="addArray(${i},'${k}')">＋項目追加</button></div>`}
+function renderArray(i,k){let b=document.getElementById(k+i);if(!b)return;let a=data.lessons[selected].slides[i][k]||[];b.innerHTML="";a.forEach((v,j)=>{let r=document.createElement("div");r.className="row";r.innerHTML=`<input value="${esc(v)}"><button class="btn danger">×</button>`;r.querySelector("input").oninput=e=>{a[j]=e.target.value;updateJSON();save()};r.querySelector("button").onclick=()=>{a.splice(j,1);renderLesson();updateJSON();save()};b.appendChild(r)})}
+function addArray(i,k){let s=data.lessons[selected].slides[i];s[k]=Array.isArray(s[k])?s[k]:[];s[k].push("");renderLesson();updateJSON();save()}
+function renderCmp(i){let b=document.getElementById("cmp"+i);if(!b)return;b.innerHTML="";(data.lessons[selected].slides[i].items||[]).forEach((x,j)=>{let d=document.createElement("div");d.className="cmp";d.innerHTML=`<div class="cmphead"><span>比較項目 ${j+1}</span><button class="btn danger">削除</button></div><div class="grid"><div class="field"><label>名前</label><input value="${esc(x.name)}"></div><div class="field"><label>役割</label><input value="${esc(x.role)}"></div></div><div class="field"><label>例</label><input value="${esc(x.example)}"></div>`;["name","role","example"].forEach((k,n)=>d.querySelectorAll("input")[n].oninput=e=>{x[k]=e.target.value;updateJSON();save()});d.querySelector("button").onclick=()=>{data.lessons[selected].slides[i].items.splice(j,1);renderLesson();updateJSON();save()};b.appendChild(d)})}
+function addCmp(i){let s=data.lessons[selected].slides[i];s.items=Array.isArray(s.items)?s.items:[];s.items.push({name:"",role:"",example:""});renderLesson();updateJSON();save()}
+function slideField(i,k,v){data.lessons[selected].slides[i][k]=v;updateJSON();save()}
+function slideType(i,t){let o=data.lessons[selected].slides[i],n={type:t,title:o.title||""};if(["title","content","end"].includes(t))n.text=o.text||"";if(["content","summary"].includes(t))n.list=Array.isArray(o.list)?o.list:[];if(t==="code"){n.language=o.language||"html";n.code=o.code||""}if(t==="flow")n.steps=Array.isArray(o.steps)?o.steps:[];if(t==="comparison")n.items=Array.isArray(o.items)?o.items:[];if(t==="end")n.next=o.next||"";data.lessons[selected].slides[i]=n;renderLesson();updateJSON();save()}
+function addSlide(){data.lessons[selected].slides.push({type:"content",title:"新しいスライド",text:"",list:[]});renderLesson();updateJSON();save()}
+function deleteSlide(i){if(data.lessons[selected].slides.length<=1)return alert("最低1つのスライドが必要です。");if(confirm("このスライドを削除しますか？")){data.lessons[selected].slides.splice(i,1);renderLesson();updateJSON();save()}}
+function moveSlide(i,d){let a=data.lessons[selected].slides,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];renderLesson();updateJSON();save()}
+function addLesson(){let id=data.lessons.length?Math.max(...data.lessons.map(x=>Number(x.id)||0))+1:1;data.lessons.push({id,category:"入門編",title:"新しいLesson",slides:[{type:"title",title:"新しいLesson",text:""},{type:"content",title:"内容",text:"",list:[]},{type:"end",title:"Lesson完了！",text:"",next:""}]});selected=data.lessons.length-1;update();save()}
+function deleteLesson(i){if(data.lessons.length<=1)return alert("最低1つのLessonが必要です。");if(!confirm("このLessonを削除しますか？"))return;data.lessons.splice(i,1);selected=Math.min(selected,data.lessons.length-1);update();save()}
+function updateJSON(){out.value=JSON.stringify(data,null,2)}
+async function copyJSON(){let t=JSON.stringify(data,null,2);try{await navigator.clipboard.writeText(t)}catch(e){out.select();document.execCommand("copy")}toast("JSONをコピーしました ✓")}
+function downloadJSON(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="data.json";a.click();URL.revokeObjectURL(u);toast("data.jsonを保存しました ✓")}
+function clearSavedData(){if(!confirm("ブラウザに保存されている編集データを削除しますか？\n\n現在の編集内容も初期状態に戻ります。必要なら先にDLしてください。"))return;localStorage.removeItem(KEY);localStorage.removeItem(SEL);data=clone(initial);selected=0;update();toast("保存データを削除しました")}
+function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
+file.addEventListener("change",e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.course||!Array.isArray(x.lessons))throw Error("形式が正しくありません");data=x;selected=0;update();save();toast("JSONを読み込みました ✓")}catch(err){alert("JSONを読み込めませんでした。\n"+err.message)}};r.readAsText(f,"UTF-8");e.target.value=""});
+update();
 </script>
 </body>
 </html>
